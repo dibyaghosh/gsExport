@@ -1,0 +1,15 @@
+Metadata-Version: 1.1
+Name: gsExport
+Version: 0.0.1
+Summary: A set of utilities to expedite submission of jupyter notebooks to Gradescope
+Home-page: http://packages.python.org/gsExport
+Author: Dibya Ghosh
+Author-email: dibya@berkeley.edu
+License: BSD
+Description:  
+        
+Keywords: gradescope jupyter notebook pdf submission latex export
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Topic :: Utilities
+Classifier: License :: OSI Approved :: BSD License
