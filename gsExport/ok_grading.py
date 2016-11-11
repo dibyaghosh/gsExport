@@ -1,5 +1,5 @@
 from IPython import get_ipython
-from client.api.assignment import load_assignment 
+from client.api.assignment import load_assignment
 import glob
 import nbformat.notebooknode as nn
 import os, contextlib
@@ -36,7 +36,6 @@ def __autograde():
 	python_instance = get_ipython()
 	with open(os.devnull, 'w') as devnull:
 		with contextlib.redirect_stdout(devnull):
-			print("POO")
 			python_instance.ex(__runner.format(ok_file=ok_file))
 	test_results = python_instance.ev("ga_test_results")
 	return "Test Name | Score | Possible | Percent Tests Passed\n --- | --- | --- | --- \n"+"\n".join(["|".join(list(map(str,test))) for test in test_results])

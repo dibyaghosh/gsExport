@@ -59,6 +59,11 @@ def compareThese(nb_base,nb_new):
 	"""
 	allOtherCells = [cell['source'] for cell in nb_base['cells']]
 	newCells = [cell for cell in nb_new['cells'] if not similar(cell['source'],allOtherCells)]
+	for cell in newCells:
+		if 'outputs' in cell and \
+		len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:
+			print("It looks like you have a cell with 4 or more images")
+			print("This may cause errors with the Gradescope submission!")
 	parse_nb = nb_new.copy()
 	parse_nb['cells'] = newCells
 	return parse_nb
