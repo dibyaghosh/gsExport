@@ -23,7 +23,8 @@ for _test in ga_tests:
 
 _ok_results_node = {'cell_type': 'markdown',
   'execution_count': None,
-  'source': ''}
+  'source': '',
+  'metadata':{}}
 
 
 def __autograde():

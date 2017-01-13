@@ -22,7 +22,7 @@ def select_one(list_of_choices,message="Which of these files is your notebook?",
 		except:
 			print("Please put a valid choice")
 
-def generateSubmission():
+def generateSubmission(toIpynb=False):
 	if not run_from_ipython():
 		print("You can't run this command from outside the Jupyter Notebook!")
 		return
@@ -43,7 +43,8 @@ def generateSubmission():
 	diffed = compareThese(instructor_notebook,student_notebook)
 	diffed.cells.insert(0,ok_grading.autograde_ipython())
 	print("Generated notebook and autograded")
-
+	if toIpynb:
+		save_notebook(diffed,'gradescope')
 	export_notebook(diffed,'gradescope')
 	display(HTML('<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>'))
 
@@ -51,14 +52,15 @@ def generateSubmission():
 
 def compareThese(nb_base,nb_new):
 	"""
-		Returns a modified version of nb_new which contains no cells which are 
+		Returns a modified version of nb_new which contains no cells which are
 		*similar* to any cells in nb_base
 
 		How similarity is defined depends on implementation; see *similar(cellSource,allOtherCells)*
 		for the current implementation
 	"""
 	allOtherCells = [cell['source'] for cell in nb_base['cells']]
-	newCells = [cell for cell in nb_new['cells'] if not similar(cell['source'],allOtherCells)]
+	newCells = [cell for cell in nb_new['cells'] if not similar(cell['source'],allOtherCells) \
+             or cell['metadata'].get('purpose','NA')=='solution']
 	for cell in newCells:
 		if 'outputs' in cell and \
 		len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:

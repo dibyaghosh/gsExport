@@ -1,4 +1,4 @@
- 
+
 import os
 from setuptools import setup
 
@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name = "gsExport",
-    version = "0.0.1",
+    version = "0.0.3",
     author = "Dibya Ghosh",
     author_email = "dibya@berkeley.edu",
     description = ("A set of utilities to expedite submission of jupyter notebooks to Gradescope"),
@@ -19,7 +19,8 @@ setup(
     keywords = "gradescope jupyter notebook pdf submission latex export",
     url = "http://packages.python.org/gsExport",
     packages=['gsExport'],
-    long_description=read('README.md'),
+    setup_requires=['setuptools-markdown'],
+    long_description_markdown_filename='README.md',
 	package_data={'gsExport': ['*.tplx']},    classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
