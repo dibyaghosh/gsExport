@@ -24,11 +24,16 @@ def export_notebook(nb,name,templating="test.tplx",debug=False):
 		print("There was an error generating your LaTeX")
 		if debug:
 			print("Showing full error message from PDFTex")
+			print("="*30)
 			print(error.output)
+			print("="*30)
+
 		else:
 			print("Showing concise error message")
+			print("="*30)
 			print('\n'.join(error.output.split('\n')[-15:]))
-
+			print("="*30)
+		raise Exception("LaTeX failed to Build")
 
 
 def run_from_ipython():
