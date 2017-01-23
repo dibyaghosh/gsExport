@@ -107,7 +107,7 @@ def compareThese(nb_base,nb_new):
 
 		if 'source' in cell and (cell['source'].count('\n') > 30 or len(cell['source']) > 4000):
 			print('Found a cell that has a little too much written in it; try to bring it down')
-			print("Here's a preview of that cell: %s"%(cell['source'][:100])
+			print("Here's a preview of that cell: %s"%(cell['source'][:100]))
 		fix_dollar_sign(cell)
 
 	parse_nb = nb_new.copy()
