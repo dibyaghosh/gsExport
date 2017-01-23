@@ -22,7 +22,7 @@ def select_one(list_of_choices,message="Which of these files is your notebook?",
 		except:
 			print("Please put a valid choice")
 
-def generateSubmission(toIpynb=False):
+def generateSubmission(toIpynb=False,**kwargs):
 	if not run_from_ipython():
 		print("You can't run this command from outside the Jupyter Notebook!")
 		return
@@ -49,7 +49,7 @@ def generateSubmission(toIpynb=False):
 	if toIpynb:
 		save_notebook(diffed,'gradescope')
 
-	export_notebook(diffed,'gradescope')
+	export_notebook(diffed,'gradescope',**kwargs)
 	display(HTML('<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>'))
 
 
