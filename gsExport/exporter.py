@@ -49,8 +49,10 @@ def generateSubmission(toIpynb=False,**kwargs):
 	if toIpynb:
 		save_notebook(diffed,'gradescope')
 
-	export_notebook(diffed,'gradescope',**kwargs)
-	display(HTML('<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>'))
+	if export_notebook(diffed,'gradescope',**kwargs) is not None:
+		display(HTML('<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>'))
+	else:
+		display(HTML('<h2>LaTeX failed to parse. Please see error message above</h2>'))
 
 
 

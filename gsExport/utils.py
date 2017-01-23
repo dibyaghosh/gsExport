@@ -33,7 +33,8 @@ def export_notebook(nb,name,templating="test.tplx",debug=False):
 			print("="*30)
 			print('\n'.join(error.output.split('\n')[-15:]))
 			print("="*30)
-		raise Exception("LaTeX failed to Build")
+		return None
+	return "%s.pdf"%name
 
 
 def run_from_ipython():
