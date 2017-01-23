@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name = "gsExport",
-    version = "0.0.3",
+    version = "0.0.8",
     author = "Dibya Ghosh",
     author_email = "dibya@berkeley.edu",
     description = ("A set of utilities to expedite submission of jupyter notebooks to Gradescope"),
@@ -19,8 +19,8 @@ setup(
     keywords = "gradescope jupyter notebook pdf submission latex export",
     url = "http://packages.python.org/gsExport",
     packages=['gsExport'],
-    setup_requires=['setuptools-markdown'],
-    long_description_markdown_filename='README.md',
+    long_description=read("README.rst"),
+    install_requires = ['jupyter','notebook','nbformat','nbconvert','okpy'],
 	package_data={'gsExport': ['*.tplx']},    classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",

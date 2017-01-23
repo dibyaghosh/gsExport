@@ -41,14 +41,39 @@ def generateSubmission(toIpynb=False):
 
 
 	diffed = compareThese(instructor_notebook,student_notebook)
-	diffed.cells.insert(0,ok_grading.autograde_ipython())
+	results = ok_grading.autograde_ipython()
+	if results is not None:
+		diffed.cells.insert(0,results)
 	print("Generated notebook and autograded")
+
 	if toIpynb:
 		save_notebook(diffed,'gradescope')
+
 	export_notebook(diffed,'gradescope')
 	display(HTML('<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>'))
 
 
+
+
+def generateGSTemplate(notebook,location='output'):
+	student_notebook = notebook.copy()
+	instructor_notebook = notebook.copy()
+	diffed = compareThese(instructor_notebook,student_notebook)
+	print("Generated template notebook")
+	print(diffed.cells)
+	export_notebook(diffed,location)
+
+def fix_dollar_sign(cell):
+	if 'cell_type' in cell and cell['cell_type'] == 'markdown':
+		cell['source'] = cell['source'].replace('$ ','$').replace(' $','$')
+
+def paraphrase(text,fromBegin=3,fromEnd=3):
+	numLines = text.count('\n')
+	if numLines < fromBegin + fromEnd:
+		return text
+	textSplit = text.split('\n')
+	newParts = textSplit[:fromBegin]+ ['... Omitting %d lines ... '%(numLines-fromBegin-fromEnd)] + textSplit[-1*fromEnd:]
+	return '\n'.join(newParts)
 
 def compareThese(nb_base,nb_new):
 	"""
@@ -59,13 +84,25 @@ def compareThese(nb_base,nb_new):
 		for the current implementation
 	"""
 	allOtherCells = [cell['source'] for cell in nb_base['cells']]
-	newCells = [cell for cell in nb_new['cells'] if not similar(cell['source'],allOtherCells) \
-             or cell['metadata'].get('purpose','NA')=='solution']
+	newCells = [cell for cell in nb_new['cells'] if cell['source'] is not None and (not similar(cell['source'],allOtherCells) \
+             or cell['metadata'].get('purpose','NA')=='solution')]
+
+	print("NUM CELLS",len(newCells))
 	for cell in newCells:
-		if 'outputs' in cell and \
-		len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:
-			print("It looks like you have a cell with 4 or more images")
-			print("This may cause errors with the Gradescope submission!")
+		execution_num = cell.get('execution_num')
+		if 'outputs' in cell:
+			if len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:
+				print("It looks like you have a cell with 4 or more images")
+				print("This may cause errors with the Gradescope submission!")
+			for output in cell['outputs']:
+				if output.get('output_type', 'NA') == 'stream' and 'text' in output:
+					output['text'] = paraphrase(output['text'])
+				if output.get('output_type','NA') == 'execute_result':
+					if 'data' in output and 'text/plain' in output['data']:
+						output['data']['text/plain'] = paraphrase(output['data']['text/plain'])
+
+		fix_dollar_sign(cell)
+
 	parse_nb = nb_new.copy()
 	parse_nb['cells'] = newCells
 	return parse_nb
@@ -75,4 +112,4 @@ def similar(cellSource,allOtherCells):
 	"""
 		Modify this to change how cells are accepted and rejected
 	"""
-	return cellSource in allOtherCells and '**Question' not in cellSource
+	return (cellSource in allOtherCells and '&zwnj;' not in cellSource)

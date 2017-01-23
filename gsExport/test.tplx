@@ -19,7 +19,7 @@
 ((* endblock docclass *))
 
 ((* block markdowncell scoped *))
-        ((*- if "&zwnj;" in cell.source-*))
+        ((*- if cell.source and "&zwnj;" in cell.source-*))
 		\cleartooddpage DETECTED
         ((*- endif -*))
 ((( super() )))

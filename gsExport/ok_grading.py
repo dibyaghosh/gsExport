@@ -31,7 +31,7 @@ def __autograde():
 	possible_ok_files = glob.glob("*.ok")
 	if len(possible_ok_files) == 0:
 		print("Couldn't find the ok file")
-		return
+		return None
 	ok_file = possible_ok_files[0]
 	print("Grading using the %s file"%ok_file)
 	python_instance = get_ipython()

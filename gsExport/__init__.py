@@ -1,1 +1,1 @@
-from .exporter import generateSubmission
+from .exporter import generateSubmission,generateGSTemplate
