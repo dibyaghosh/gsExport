@@ -20,7 +20,7 @@ setup(
     url = "http://packages.python.org/gsExport",
     packages=['gsExport'],
     long_description=read("README.rst"),
-    install_requires = ['jupyter','notebook','nbformat','nbconvert','okpy'],
+    install_requires = ['pytz','jupyter','notebook','nbformat','nbconvert','okpy'],
 	package_data={'gsExport': ['*.tplx']},    classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
