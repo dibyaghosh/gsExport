@@ -4,6 +4,7 @@ import os
 import glob
 from IPython.core.display import display, HTML
 from . import ok_grading
+from . import headings
 from .utils import *
 
 def select_one(list_of_choices,message="Which of these files is your notebook?",errormessage="Couldn't find anything"):
@@ -44,6 +45,9 @@ def generateSubmission(toIpynb=False,**kwargs):
 	results = ok_grading.autograde_ipython()
 	if results is not None:
 		diffed.cells.insert(0,results)
+	header = headings.generate_header()
+	if header is not None:
+		diffed.cells.insert(0,header)
 	print("Generated notebook and autograded")
 
 	if toIpynb:
