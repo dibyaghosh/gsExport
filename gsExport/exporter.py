@@ -102,7 +102,12 @@ def compareThese(nb_base,nb_new):
 				if output.get('output_type','NA') == 'execute_result':
 					if 'data' in output and 'text/plain' in output['data']:
 						output['data']['text/plain'] = paraphrase(output['data']['text/plain'])
+				if output.get('output_type', 'NA') == 'error' and 'traceback' in output:
+					output['traceback'] = output['traceback'][:1]
 
+		if 'source' in cell and (cell['source'].count('\n') > 30 or len(cell['source']) > 4000):
+			print('Found a cell that has a little too much written in it; try to bring it down')
+			print("Here's a preview of that cell: %s"%(cell['source'][:100])
 		fix_dollar_sign(cell)
 
 	parse_nb = nb_new.copy()

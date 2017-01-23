@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name = "gsExport",
-    version = "0.0.10",
+    version = "0.1.0",
     author = "Dibya Ghosh",
     author_email = "dibya@berkeley.edu",
     description = ("A set of utilities to expedite submission of jupyter notebooks to Gradescope"),

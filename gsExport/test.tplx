@@ -15,6 +15,7 @@
 \documentclass[11pt]{article}
 \newcommand\cleartooddpage{\clearpage
 	\ifodd\value{page}\else\null\clearpage\fi}
+\date\today
 
 ((* endblock docclass *))
 
