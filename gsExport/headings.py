@@ -15,5 +15,5 @@ def generate_header():
 	date = datetime.now(tz=pytz.utc)
 	date = date.astimezone(timezone('US/Pacific'))
 	results_node = _header_node.copy()
-	results_node['source'] = 'Local date & time is  :', date.strftime(date_format)
+	results_node['source'] = 'Local date & time is  : %s'% date.strftime(date_format)
 	return nn.NotebookNode(results_node)
