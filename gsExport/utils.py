@@ -27,7 +27,7 @@ def export_notebook(nb,name,templating="test.tplx",debug=False):
 			print(error.output)
 		else:
 			print("Showing concise error message")
-			print('\n'.join(error.split('\n')[-15:]))
+			print('\n'.join(error.output.split('\n')[-15:]))
 
 
 
