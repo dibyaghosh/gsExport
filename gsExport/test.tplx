@@ -12,7 +12,7 @@
 %===============================================================================
 
 ((* block docclass *))
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 \newcommand\cleartooddpage{\clearpage
 	\ifodd\value{page}\else\null\clearpage\fi}
 \date\today
