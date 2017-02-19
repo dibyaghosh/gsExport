@@ -94,7 +94,7 @@ def cell_by_cell():
             print("="*30)
             print("Here's the error message we were able to extract")
             print(error)
-
+            print("="*30)
 
 def generateGSTemplate(notebook,location='output'):
     student_notebook = notebook.copy()
