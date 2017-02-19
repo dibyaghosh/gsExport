@@ -28,7 +28,7 @@ def export_notebook(nb,name,templating="test.tplx",debug=False):
 
         else:
             print("Showing concise error message")
-            output = error.output.partition("No \author given.")[-1]
+            output = "\n".join(error.output.split("\n")[-15:])
         print("="*30)
         print(output)
         print("="*30)
@@ -41,7 +41,7 @@ def has_error(nb):
         pdf_exporter.from_notebook_node(nb)
         return None
     except nbconvert.pdf.LatexFailed as error:
-        return error.output.partition("No \author given.")[-1]
+        return "\n".join(error.output.split("\n")[-15:])
 
 
 def run_from_ipython():

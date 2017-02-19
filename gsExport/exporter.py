@@ -82,7 +82,7 @@ def cell_by_cell():
     diffed = generate_diffed()
     all_cells = diffed.cells
     for cell in tqdm(all_cells):
-        if '&zwnj;' in cell['source']:
+        if '&zwnj;' in cell['source'] or cell['cell_type'] == 'code':
             continue
         new_nb = diffed.copy()
         new_nb.cells = [cell]
@@ -90,7 +90,7 @@ def cell_by_cell():
         if error is not None:
             print("There is an error with the following cell")
             print("="*30)
-            print(cell['spurce'])
+            print(cell['source'])
             print("="*30)
             print("Here's the error message we were able to extract")
             print(error)
