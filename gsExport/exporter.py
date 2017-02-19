@@ -6,6 +6,7 @@ from IPython.core.display import display, HTML
 from . import ok_grading
 from . import headings
 from .utils import *
+from tqdm import tqdm
 
 def select_one(list_of_choices,message="Which of these files is your notebook?",errormessage="Couldn't find anything"):
     if len(list_of_choices) == 0:
@@ -80,7 +81,9 @@ def cell_by_cell():
         return
     diffed = generate_diffed()
     all_cells = diffed.cells
-    for cell in all_cells:
+    for cell in tqdm(all_cells):
+        if '&zwnj;' in cell['source']:
+            continue
         new_nb = diffed.copy()
         new_nb.cells = [cell]
         error = has_error(new_nb)
@@ -91,7 +94,7 @@ def cell_by_cell():
             print("="*30)
             print("Here's the error message we were able to extract")
             print(error)
-            
+
 
 def generateGSTemplate(notebook,location='output'):
     student_notebook = notebook.copy()

@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name = "gsExport",
-    version = "0.2.0",
+    version = "0.2.1",
     author = "Dibya Ghosh",
     author_email = "dibya@berkeley.edu",
     description = ("A set of utilities to expedite submission of jupyter notebooks to Gradescope"),
@@ -20,7 +20,7 @@ setup(
     url = "http://packages.python.org/gsExport",
     packages=['gsExport'],
     long_description=read("README.rst"),
-    install_requires = ['pytz','jupyter','notebook','nbformat','nbconvert<5','okpy'],
+    install_requires = ['pytz','jupyter','notebook','nbformat','nbconvert<5','okpy','tqdm'],
     package_data={'gsExport': ['*.tplx']},    classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
