@@ -3,64 +3,31 @@ from nbconvert import PDFExporter
 import os
 import glob
 from IPython.core.display import display, HTML
-from . import ok_grading
+import hashlib
 from . import headings
 from .utils import *
 from tqdm import tqdm
 
-def select_one(list_of_choices,message="Which of these files is your notebook?",errormessage="Couldn't find anything"):
-    if len(list_of_choices) == 0:
-        print(errormessage)
-        raise RuntimeError(errormessage)
-    if len(list_of_choices) == 1:
-        return list_of_choices[0]
-    print(message)
-    for n,elem in enumerate(list_of_choices):
-        print(n+1,elem)
-    while True:
-        try:
-            n = int(input("Which item do you want? (1-%d)"%(len(list_of_choices))))
-            return list_of_choices[n-1]
-        except:
-            print("Please put a valid choice")
-
-
-def generate_diffed():
-    input_file = select_one(glob.glob("./*.ipynb"), "Which of these files is your notebook?",\
-            "Can't find your notebook")
+def generate_filtered(input_file):
     print("Processing %s"%input_file)
     student_notebook = load_notebook(input_file)
+    filtered = filter_nb(student_notebook)
+    return filtered
 
-
-    input_file = select_one(glob.glob("./grading/*.ipynb"),
-                            "Which of these files is the base notebook?",
-                            "Can't find your (reference) notebook; Please contact your instructor")
-    print("Base Notebook processing %s"%input_file)
-    instructor_notebook = load_notebook(input_file)
-
-
-    diffed = compareThese(instructor_notebook, student_notebook)
-    return diffed
-
-def generateSubmission(toIpynb=False, **kwargs):
+def generateSubmission(fileName,**kwargs):
     if not run_from_ipython():
         print("You can't run this command from outside the Jupyter Notebook!")
         return
-    diffed = generate_diffed()
-    results = ok_grading.autograde_ipython()
-    if results is not None:
-        diffed.cells.insert(0, results)
+    diffed = generate_filtered(fileName)
     header = headings.generate_header()
     if header is not None:
         diffed.cells.insert(0, header)
     print("Generated notebook and autograded")
 
-    if toIpynb:
-        save_notebook(diffed, 'gradescope')
 
-    if export_notebook(diffed, 'gradescope', **kwargs) is not None:
+    if export_notebook(diffed, fileName.replace('.ipynb','_submission'), **kwargs) is not None:
         display(HTML(
-            """<h1><a href="gradescope.pdf"> Download this and submit to gradescope!</a></h1>"""
+            """<h1><a href="%s"> Download this and submit to gradescope!</a></h1>"""%(fileName.replace('.ipynb','_submission.pdf'))
             ))
     else:
         display(HTML(
@@ -75,34 +42,33 @@ def generateSubmission(toIpynb=False, **kwargs):
             ))
 
 
-def cell_by_cell():
-    if not run_from_ipython():
-        print("You can't run this command from outside the Jupyter Notebook!")
-        return
-    diffed = generate_diffed()
-    all_cells = diffed.cells
-    for cell in tqdm(all_cells):
-        if '&zwnj;' in cell['source'] or cell['cell_type'] == 'code':
-            continue
-        new_nb = diffed.copy()
-        new_nb.cells = [cell]
-        error = has_error(new_nb)
-        if error is not None:
-            print("There is an error with the following cell")
-            print("="*30)
-            print(cell['source'])
-            print("="*30)
-            print("Here's the error message we were able to extract")
-            print(error)
-            print("="*30)
+def cell_by_cell(fileName):
+    assert run_from_ipython(), "You can't run this command from outside the Jupyter Notebook!"
 
-def generateGSTemplate(notebook,location='output'):
-    student_notebook = notebook.copy()
-    instructor_notebook = notebook.copy()
-    diffed = compareThese(instructor_notebook,student_notebook)
-    print("Generated template notebook")
-    print(diffed.cells)
-    export_notebook(diffed,location)
+    diffed = generate_filtered(fileName)
+    temp_nb = diffed.copy()
+
+    for cell in tqdm(diffed.cells):
+        if cell['cell_type'] == 'code':
+            continue
+        temp_nb.cells = [cell]
+        error = has_error(temp_nb)
+
+        if error is not None:
+            print("""
+            
+            There is an error with the following cell:
+            ==========================================================================
+            
+            %s
+            
+            ==========================================================================
+            Here's the error message we were able to extract
+            
+            %s
+
+            ==========================================================================
+            """%(cell['source'],str(error)))
 
 def fix_dollar_sign(cell):
     if 'cell_type' in cell and cell['cell_type'] == 'markdown':
@@ -116,25 +82,20 @@ def paraphrase(text,fromBegin=3,fromEnd=3):
     newParts = textSplit[:fromBegin]+ ['... Omitting %d lines ... '%(numLines-fromBegin-fromEnd)] + textSplit[-1*fromEnd:]
     return '\n'.join(newParts)
 
-def compareThese(nb_base,nb_new):
-    """
-        Returns a modified version of nb_new which contains no cells which are
-        *similar* to any cells in nb_base
 
-        How similarity is defined depends on implementation; see *similar(cellSource,allOtherCells)*
-        for the current implementation
+def clean_cells(cells):
     """
-    allOtherCells = [cell['source'] for cell in nb_base['cells']]
-    newCells = [cell for cell in nb_new['cells'] if cell['source'] is not None and (not similar(cell['source'],allOtherCells) \
-             or cell['metadata'].get('purpose','NA')=='solution')]
-
-    print("NUM CELLS",len(newCells))
-    for cell in newCells:
+    Works in place
+    """
+    for cell in cells:
         execution_num = cell.get('execution_num')
         if 'outputs' in cell:
+            # Too many images?
             if len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:
                 print("It looks like you have a cell with 4 or more images")
                 print("This may cause errors with the Gradescope submission!")
+            
+            # Paraphrase output
             for output in cell['outputs']:
                 if output.get('output_type', 'NA') == 'stream' and 'text' in output:
                     output['text'] = paraphrase(output['text'])
@@ -146,16 +107,37 @@ def compareThese(nb_base,nb_new):
 
         if 'source' in cell and (cell['source'].count('\n') > 30 or len(cell['source']) > 4000):
             print('Found a cell that has a little too much written in it; try to bring it down')
-            print("Here's a preview of that cell: %s"%(cell['source'][:100]))
+            print("Here's a preview of that cell: \n\n\n %s"%(cell['source'][:200]))
+        
         fix_dollar_sign(cell)
 
-    parse_nb = nb_new.copy()
+def filter_nb(nb):
+    """
+        Returns a modified version of nb_new which contains no cells which are
+        *similar* to any cells in nb_base. Further culls output to allow for good PDF generation
+       
+    """
+    remove_all_whitespace = lambda string: "".join(string.split())
+    getHash = lambda cell: hashlib.md5(remove_all_whitespace(cell['source']).encode('utf8')).hexdigest()
+
+    newCells = []
+
+    if 'checksums' not in nb['metadata']:
+        nb['metadata']['checksums'] = list()
+    
+    numPageBreaks = len([cell for cell in nb['cells'] if '#newpage' in cell['source']])
+    expectedNumPageBreaks = nb['metadata'].get('number_of_pagebreaks',numPageBreaks)
+    assert numPageBreaks == expectedNumPageBreaks,\
+             "The number of pagebreaks (%d) does not match the expected number of pagebreaks (%d)"%(numPageBreaks,expectedNumPageBreaks)
+
+    for cell in nb['cells']:
+        if cell['metadata'].get('#student',False) or '#newpage' in cell['source']:
+            newCells.append(cell)
+        if getHash(cell) not in nb['metadata']['checksums']:
+            newCells.append(cell)
+
+    clean_cells(newCells)
+ 
+    parse_nb = nb.copy()
     parse_nb['cells'] = newCells
     return parse_nb
-
-
-def similar(cellSource,allOtherCells):
-    """
-        Modify this to change how cells are accepted and rejected
-    """
-    return (cellSource in allOtherCells and '&zwnj;' not in cellSource)

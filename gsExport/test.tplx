@@ -20,8 +20,8 @@
 ((* endblock docclass *))
 
 ((* block markdowncell scoped *))
-        ((*- if cell.source and "&zwnj;" in cell.source-*))
-		\cleartooddpage DETECTED
+        ((*- if cell.source and "#newpage" in cell.source-*))
+		\cleartooddpage
         ((*- endif -*))
 ((( super() )))
 ((* endblock markdowncell *))
