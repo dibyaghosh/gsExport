@@ -40,11 +40,17 @@ In your notebook, add the following
 - add the text `#newpage` in the Markdown cells before which you'd like to pagebreak (for example, the beginning of a question)
 - add '#student' on all cells in which you expect the student to write information
 
-We use the following structure inside the IPython notebook in order to correctly work
+To generate the new notebook, run the following commands in the shell
 
-- If a markdown cell contains '#newpage' in the source, this cell is added no matter what: a 2 pagebreak is added prior to the markdown cell (this will align every 2 pages) 
-- If a cell's metadata has cell['metadata']['#student'] = True, then the cell is added no matter what
-- We need a list of MD5 checksums of each cell  in the notebook metadata: nb['metadata]['checksums']
+::
+
+    jupyter nbconvert hw01a.ipynb --NotebookExporter.preprocessors="['gsExport.gsExportPreprocessor']" --to notebook 
+
+which will generate a notebook with all the appropriate structure in hw01a.nbconvert.ipynb. The following structure inside the IPython notebook is added
+
+- The number of '#newpages' in nb['metadata']['number_of_pages']
+- All cells with '#student' set cell['metadata']['#student'] = True, and the line with '#student' is removed
+- We save a list of MD5 checksums of each cell  in the notebook metadata: nb['metadata]['checksums']
 
 
 
