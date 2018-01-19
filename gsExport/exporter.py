@@ -133,7 +133,7 @@ def filter_nb(nb):
     for cell in nb['cells']:
         if cell['metadata'].get('#student',False) or '#newpage' in cell['source']:
             newCells.append(cell)
-        else if getHash(cell) not in nb['metadata']['checksums']:
+        elif getHash(cell) not in nb['metadata']['checksums']:
             newCells.append(cell)
 
     clean_cells(newCells)
