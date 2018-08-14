@@ -94,7 +94,7 @@ def clean_cells(cells):
             if len([i for i in cell['outputs'] if 'data' in i and 'image/png' in i['data']]) > 3:
                 print("It looks like you have a cell with 4 or more images")
                 print("This may cause errors with the Gradescope submission!")
-            
+
             # Paraphrase output
             for output in cell['outputs']:
                 if output.get('output_type', 'NA') == 'stream' and 'text' in output:
@@ -108,14 +108,14 @@ def clean_cells(cells):
         if 'source' in cell and (cell['source'].count('\n') > 30 or len(cell['source']) > 4000):
             print('Found a cell that has a little too much written in it; try to bring it down')
             print("Here's a preview of that cell: \n\n\n %s"%(cell['source'][:200]))
-        
+
         fix_dollar_sign(cell)
 
 def filter_nb(nb):
     """
         Returns a modified version of nb_new which contains no cells which are
         *similar* to any cells in nb_base. Further culls output to allow for good PDF generation
-       
+
     """
     remove_all_whitespace = lambda string: "".join(string.split())
     getHash = lambda cell: hashlib.md5(remove_all_whitespace(cell['source']).encode('utf8')).hexdigest()
@@ -124,11 +124,7 @@ def filter_nb(nb):
 
     if 'checksums' not in nb['metadata']:
         nb['metadata']['checksums'] = list()
-    
-    numPageBreaks = len([cell for cell in nb['cells'] if '#newpage' in cell['source']])
-    expectedNumPageBreaks = nb['metadata'].get('number_of_pagebreaks',numPageBreaks)
-    assert numPageBreaks == expectedNumPageBreaks,\
-             "The number of pagebreaks (%d) does not match the expected number of pagebreaks (%d)"%(numPageBreaks,expectedNumPageBreaks)
+
 
     for cell in nb['cells']:
         if cell['metadata'].get('#student',False) or '#newpage' in cell['source']:
@@ -137,7 +133,7 @@ def filter_nb(nb):
             newCells.append(cell)
 
     clean_cells(newCells)
- 
+
     parse_nb = nb.copy()
     parse_nb['cells'] = newCells
     return parse_nb
