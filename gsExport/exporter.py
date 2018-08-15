@@ -125,6 +125,11 @@ def filter_nb(nb):
     if 'checksums' not in nb['metadata']:
         nb['metadata']['checksums'] = list()
 
+    numPageBreaks = len([cell for cell in nb['cells'] if '#newpage' in cell['source']])
+    expectedNumPageBreaks = nb['metadata'].get('number_of_pagebreaks',numPageBreaks)
+    assert numPageBreaks < expectedNumPageBreaks,\
+        ("The number of pagebreaks (%d) is fewer than the expected number of pagebreaks "
+         "(%d). Did you accidentally delete any?") % (numPageBreaks, expectedNumPageBreaks)
 
     for cell in nb['cells']:
         if cell['metadata'].get('#student',False) or '#newpage' in cell['source']:
