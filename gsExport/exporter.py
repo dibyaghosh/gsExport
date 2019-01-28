@@ -27,7 +27,7 @@ def generateSubmission(fileName,**kwargs):
 
     if export_notebook(diffed, fileName.replace('.ipynb','_submission'), **kwargs) is not None:
         display(HTML(
-            """<h1><a href="%s"> Download this and submit to gradescope!</a></h1>"""%(fileName.replace('.ipynb','_submission.pdf'))
+            """<h1><a href="%s" download> Download this and submit to gradescope!</a></h1>"""%(fileName.replace('.ipynb','_submission.pdf'))
             ))
     else:
         display(HTML(
@@ -56,15 +56,15 @@ def cell_by_cell(fileName):
 
         if error is not None:
             print("""
-            
+
             There is an error with the following cell:
             ==========================================================================
-            
+
             %s
-            
+
             ==========================================================================
             Here's the error message we were able to extract
-            
+
             %s
 
             ==========================================================================
